@@ -54,6 +54,24 @@ ENV GOOS=linux GOARCH=arm64
 RUN go build -o "tmp/$(BINARY_NAME)"
 RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_linux_arm64.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
 
+FROM build-base AS build-android-armv7
+RUN wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
+RUN unzip android-ndk-r27c-linux.zip
+ENV GOOS=android GOARCH=arm GOARM=7 CC=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++
+RUN go install std
+ENV GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 CC=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++
+RUN go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_armv7.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
+
+FROM build-base AS build-android-arm64
+RUN wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
+RUN unzip android-ndk-r27c-linux.zip
+ENV GOOS=android GOARCH=arm64 CC=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++
+RUN go install std
+ENV GOOS=android GOARCH=arm64 CGO_ENABLED=1 CC=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++
+RUN go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_arm64.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
+
 FROM $(BASE_IMAGE)
 COPY --from=build-windows-amd64 /s/binaries /s/binaries
 COPY --from=build-linux-amd64 /s/binaries /s/binaries
@@ -62,6 +80,8 @@ COPY --from=build-darwin-arm64 /s/binaries /s/binaries
 COPY --from=build-linux-armv6 /s/binaries /s/binaries
 COPY --from=build-linux-armv7 /s/binaries /s/binaries
 COPY --from=build-linux-arm64 /s/binaries /s/binaries
+COPY --from=build-android-armv7 /s/binaries /s/binaries
+COPY --from=build-android-arm64 /s/binaries /s/binaries
 $(DOCKERFILE_CHECKSUM)
 endef
 export DOCKERFILE_BINARIES
