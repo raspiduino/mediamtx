@@ -58,18 +58,18 @@ FROM build-base AS build-android-armv7
 RUN wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
 RUN unzip android-ndk-r27c-linux.zip
 ENV GOOS=android GOARCH=arm GOARM=7
-RUN CC=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++ go install std
+RUN CC=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++ go install std
 ENV GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1
-RUN CC=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++ go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+RUN CC=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++ go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
 RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_armv7.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
 
 FROM build-base AS build-android-arm64
 RUN wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
 RUN unzip android-ndk-r27c-linux.zip
 ENV GOOS=android GOARCH=arm64
-RUN CC=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ go install std
+RUN CC=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ go install std
 ENV GOOS=android GOARCH=arm64 CGO_ENABLED=1
-RUN CC=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=$PWD/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+RUN CC=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=$(pwd)/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
 RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_arm64.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
 
 FROM $(BASE_IMAGE)
