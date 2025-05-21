@@ -59,7 +59,8 @@ RUN wget -O /tmp/android-ndk-r27c-linux.zip https://dl.google.com/android/reposi
 RUN unzip /tmp/android-ndk-r27c-linux.zip -d /tmp
 ENV GOOS=android GOARCH=arm GOARM=7 CC=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++
 RUN go install std
-RUN CGO_ENABLED=1 go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+ENV GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 CC=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang CXX=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi34-clang++
+RUN go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
 RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_armv7.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
 
 FROM build-base AS build-android-arm64
@@ -67,7 +68,8 @@ RUN wget -O /tmp/android-ndk-r27c-linux.zip https://dl.google.com/android/reposi
 RUN unzip /tmp/android-ndk-r27c-linux.zip -d /tmp
 ENV GOOS=android GOARCH=arm64 CC=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ 
 RUN go install std
-RUN CGO_ENABLED=1 go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
+ENV GOOS=android GOARCH=arm64 CGO_ENABLED=1 CC=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang CXX=/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang++ 
+RUN go build -ldflags=-checklinkname=0 -o "tmp/$(BINARY_NAME)"
 RUN tar -C tmp -czf "binaries/$(BINARY_NAME)_$$(cat internal/core/VERSION)_android_arm64.tar.gz" --owner=0 --group=0 "$(BINARY_NAME)" mediamtx.yml LICENSE
 
 FROM $(BASE_IMAGE)
